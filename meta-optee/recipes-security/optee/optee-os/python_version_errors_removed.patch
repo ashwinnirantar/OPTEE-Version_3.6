@@ -1,0 +1,50 @@
+diff --git a/scripts/gen_ldelf_hex.py b/scripts/gen_ldelf_hex.py
+index 2a8c22a..a278c82 100755
+--- a/scripts/gen_ldelf_hex.py
++++ b/scripts/gen_ldelf_hex.py
+@@ -49,8 +49,11 @@ def emit_load_segments(elffile, outf):
+                 next_rwseg_va = segment['p_vaddr'] + segment['p_filesz']
+             load_size += segment['p_filesz']
+             n = n + 1
++    a = b"const uint8_t ldelf_data["
++    b = str(round_up(load_size, 4096)).encode()
++    c = b"]"
+ 
+-    outf.write(b'const uint8_t ldelf_data[%d]' % round_up(load_size, 4096))
++    outf.write(b''.join([a,b,c]))
+     outf.write(b' __aligned(4096) = {\n')
+     i = 0
+     for segment in elffile.iter_segments():
+@@ -68,8 +71,15 @@ def emit_load_segments(elffile, outf):
+                     outf.write(b' ')
+     outf.write(b'};\n')
+ 
+-    outf.write(b'const unsigned int ldelf_code_size = %d;\n' % code_size)
+-    outf.write(b'const unsigned int ldelf_data_size = %d;\n' % data_size)
++
++    d = "const unsigned int ldelf_code_size =".encode()
++    e = str(code_size).encode()
++    dat = str(data_size).encode()
++    f = ";\n".encode()
++    ge = "const unsigned int ldelf_data_size =".encode()
++
++    outf.write(b''.join([d,e,f]))
++    outf.write(b''.join([ge,dat,f]))
+ 
+ 
+ def get_args():
+@@ -97,8 +107,12 @@ def main():
+     outf.write(b'#include <compiler.h>\n')
+     outf.write(b'#include <stdint.h>\n')
+     emit_load_segments(elffile, outf)
+-    outf.write(b'const unsigned long ldelf_entry = %lu;\n' %
+-               elffile.header['e_entry'])
++    
++    elfErrorFirstPart = "const unsigned long ldelf_entry = ".encode()
++    elfErrorSecondPart = str(elffile.header['e_entry']).encode()
++    elfErrorThirdPart = ";\n".encode()
++ 
++    outf.write(b''.join([elfErrorFirstPart,elfErrorSecondPart,elfErrorThirdPart]))
+ 
+     inf.close()
+     outf.close()
