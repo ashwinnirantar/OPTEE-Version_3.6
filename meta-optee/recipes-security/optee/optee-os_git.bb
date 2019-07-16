@@ -13,6 +13,7 @@ inherit deploy pythonnative
 SRCREV = "ee595e950f5be1ace3e831261c22a0e99f959046"
 SRC_URI = "git://github.com/OP-TEE/optee_os.git \
            file://0001-allow-setting-sysroot-for-libgcc-lookup.patch \
+	   file://python_version_errors_removed.patch \
           "
 
 S = "${WORKDIR}/git"
